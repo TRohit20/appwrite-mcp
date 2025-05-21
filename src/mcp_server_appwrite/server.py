@@ -96,6 +96,14 @@ async def serve() -> Server:
         name: str, arguments: dict | None
     ) -> list[types.TextContent | types.ImageContent | types.EmbeddedResource]:
         
+        # Validate tool name: ensure it's alphanumeric to prevent command injection
+        if not name.isalnum():
+            return [types.TextContent(type="text", text="Error: Invalid tool name")]
+        
+        # Validate arguments
+        if arguments is not None and not isinstance(arguments, dict):
+            return [types.TextContent(type="text", text="Error: Arguments must be a dictionary")]
+        
         try:
             tool_info = tools_manager.get_tool(name)
             if not tool_info:
